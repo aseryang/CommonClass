@@ -152,10 +152,10 @@ void MultiTimer::run()
 		if (elapsedTime > 0)
 		{
 			updateElapsedTime(elapsedTime);
+			lastTime = now;
 			if (firstTimer->m_countDownTime <= 0)
 			{
 				callAllTimers();
-				lastTime = now;
 			}
 			else
 			{
