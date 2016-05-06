@@ -27,11 +27,14 @@ public:
 	virtual ~MultiTimer(){}
 	void startTimer(int id, int interval);
 	void stopTimer(int id);
+	virtual void timerCallBack(int id) = 0;
 private:
 	void addTimer(Timer* p);
 	void removeTimer(Timer* p);
 	void run();
-	virtual void timerCallBack(int id) = 0;
+	void updateElapsedTime(int et);
+	void callAllTimers();
+	
 protected:
 private:
 	std::map<int, Timer*>	timerMap;
@@ -96,8 +99,16 @@ void MultiTimer::addTimer(Timer* p)
 			{
 				p->next = t;
 				p->pre = t->pre;
-				t->pre->next = p;
+				
+				if (t->pre)
+				{
+					t->pre->next = p;
+				}
 				t->pre = p;
+				if (NULL == t->next)
+				{
+					firstTimer = p;
+				}
 				break;
 			}
 		}
@@ -105,33 +116,30 @@ void MultiTimer::addTimer(Timer* p)
 }
 void MultiTimer::removeTimer(Timer* p)
 {
-	Timer* t = firstTimer;
-	while (t)
+	if (NULL == p)
 	{
-		if (t != p)
+		return;
+	}
+
+	if (p->pre != NULL)
+	{
+		p->pre->next = p->next;
+		if (p->next)
 		{
-			t = t->next;
-		}
-		else
-		{
-			if (t == firstTimer)
-			{
-				firstTimer = firstTimer->next;
-				firstTimer->pre = NULL;
-			}
-			else
-			{
-				t->pre->next = t->next;
-				if (t->next)
-				{
-					t->next->pre = t->pre;
-				}
-				p->pre = NULL;
-				p->next = NULL;
-			}
-			break;
+			p->next->pre = p->pre;
 		}
 	}
+	else
+	{
+		firstTimer = p->next;
+		if (p->next)
+		{
+			p->next->pre = NULL;
+		}
+	}
+
+	p->pre = NULL;
+	p->next = NULL;
 }
 void MultiTimer::run()
 {
@@ -143,34 +151,37 @@ void MultiTimer::run()
 		
 		if (elapsedTime > 0)
 		{
-			Timer* t = firstTimer;
-			while (t)
+			updateElapsedTime(elapsedTime);
+			if (firstTimer->m_countDownTime <= 0)
 			{
-				t->m_countDownTime -= elapsedTime;
-				if (t->m_countDownTime <= 0)
-				{
-					timerCallBack(t->getId());
-					lastTime = now;
-				}
-				t = t->next;
+				callAllTimers();
+				lastTime = now;
 			}
-//			t = firstTimer;
-// 			while (t)
-// 			{
-// 				Timer* temp = t->next;
-// 				if (t->m_countDownTime <= 0)
-// 				{
-// 					t->m_countDownTime = t->m_periodTime;
-// 					removeTimer(t);
-// 					addTimer(t);
-// 				}
-// 				t = temp;
-// 			}
-// 			if (firstTimer->m_countDownTime > 0)
-// 			{
-// 				Sleep(firstTimer->m_countDownTime);
-// 			}
+			else
+			{
+				Sleep(50);
+			}
 		}	
+	}
+}
+void MultiTimer::updateElapsedTime(int et)
+{
+	Timer* t = firstTimer;
+	while (t)
+	{
+		t->m_countDownTime -= et;
+		t = t->next;
+	}
+}
+void MultiTimer::callAllTimers()
+{
+	while (firstTimer != NULL && firstTimer->m_countDownTime <= 0)
+	{
+		Timer* temp = firstTimer;
+		timerCallBack(temp->getId());
+		temp->m_countDownTime = temp->m_periodTime;
+		removeTimer(temp);
+		addTimer(temp);	
 	}
 }
 #endif
