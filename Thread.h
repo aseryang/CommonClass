@@ -90,10 +90,9 @@ DWORD Thread::ThreadEnter(LPVOID lpParameter)
 	{
 		return -1;
 	}
-	while (!pObj->isShouldExit())
-	{
-		pObj->run();
-	}
+
+	pObj->run();
+
 	return 0;
 }
 
