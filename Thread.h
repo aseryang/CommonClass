@@ -1,6 +1,21 @@
 #ifndef _WIN_THREAD_H
 #define _WIN_THREAD_H
 #include <windows.h>
+class CriticalSectionLock
+{
+public:
+	CriticalSectionLock(CRITICAL_SECTION & cs):m_cs(cs)
+	{
+		InitializeCriticalSection(&m_cs);
+		EnterCriticalSection(&m_cs);
+	}
+	virtual ~CriticalSectionLock()
+	{
+		 LeaveCriticalSection(&m_cs);  
+	}
+private:
+	CRITICAL_SECTION& m_cs;
+};
 class WaitEvent
 {
 public:
