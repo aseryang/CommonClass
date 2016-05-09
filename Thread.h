@@ -1,7 +1,29 @@
 #ifndef _WIN_THREAD_H
 #define _WIN_THREAD_H
 #include <windows.h>
-
+class WaitEvent
+{
+public:
+	WaitEvent()
+	{
+		handle = CreateEvent(NULL, FALSE, FALSE, NULL);
+	}
+	virtual ~WaitEvent()
+	{
+		CloseHandle(handle);
+		handle = NULL;
+	}
+	void wait(int ms)
+	{
+		WaitForSingleObject(handle, ms);
+	}
+	void notify()
+	{
+		SetEvent(handle);
+	}
+private:
+	HANDLE handle;
+};
 class Thread
 {
 public:
@@ -19,10 +41,19 @@ public:
 	void stopThread();
 	bool isShouldExit();
 	static DWORD WINAPI ThreadEnter(LPVOID lpParameter);
+	void wait(int time)
+	{
+		m_waitEvent.wait(time);
+	}
+	void notify()
+	{
+		m_waitEvent.notify();
+	}
 
 private:
-	HANDLE	m_hThreadHandle;
-	bool	m_bShouldExit;
+	HANDLE		m_hThreadHandle;
+	bool		m_bShouldExit;
+	WaitEvent	m_waitEvent;
 };
 
 bool Thread::isShouldExit()
