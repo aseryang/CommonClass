@@ -6,7 +6,6 @@ class CriticalSectionLock
 public:
 	CriticalSectionLock(CRITICAL_SECTION & cs):m_cs(cs)
 	{
-		InitializeCriticalSection(&m_cs);
 		EnterCriticalSection(&m_cs);
 	}
 	virtual ~CriticalSectionLock()
