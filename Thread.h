@@ -4,16 +4,24 @@
 class CriticalSectionLock
 {
 public:
-	CriticalSectionLock(CRITICAL_SECTION & cs):m_cs(cs)
+	CriticalSectionLock()
 	{
-		EnterCriticalSection(&m_cs);
+		InitializeCriticalSection(&m_cs);		
 	}
 	virtual ~CriticalSectionLock()
 	{
-		 LeaveCriticalSection(&m_cs);  
+		DeleteCriticalSection(&m_cs);
+	}
+	void Enter()
+	{
+		EnterCriticalSection(&m_cs);
+	}
+	void Exit()
+	{
+		LeaveCriticalSection(&m_cs);
 	}
 private:
-	CRITICAL_SECTION& m_cs;
+	CRITICAL_SECTION m_cs;
 };
 class WaitEvent
 {
