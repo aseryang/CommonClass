@@ -159,7 +159,7 @@ void MultiTimer::run()
 			}
 			else
 			{
-				Sleep(50);
+				wait(50 < elapsedTime? elapsedTime: 50);
 			}
 		}	
 	}
