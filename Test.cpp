@@ -1,5 +1,4 @@
 #include "stdafx.h"
-//#include "Thread.h"
 #include "Timer.h"
 #include <iostream>
 #include <List>
