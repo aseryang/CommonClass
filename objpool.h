@@ -56,5 +56,5 @@ public:
 private:
 	queue<T*>	m_queAllObj;
 	vector<T*>	m_allArray;
-	int			m_increaseSize;
+	int		m_increaseSize;
 };
